@@ -6,28 +6,34 @@
 
 char *increment_cmd = "(";
 
-int go_to_level(const char input[])
-{
+struct Result {
   int level_num;
-  bool has_entered_basement = false;
-  int input_len = strlen(input);
+  int basement_cmd_pos;
+} result = { 0, 0 };
 
-  for (int i = 0; i < input_len; i++) {
+struct Result get_result(const char input[])
+{
+  int input_len = strlen(input);
+  bool has_entered_basement = false;
+
+  for (int i; i < input_len; i++) {
     int comp_val = strncmp(&input[i], increment_cmd, 1);
-    level_num = comp_val == 0 ? level_num + 1 : level_num - 1;
-    if (level_num < 0 && !has_entered_basement) {
+    result.level_num = comp_val == 0 ? result.level_num + 1 : result.level_num - 1;
+
+    if (!has_entered_basement && result.level_num < 0) {
+      result.basement_cmd_pos = i + 1;
       has_entered_basement = true;
-      printf("Entered basement at pos: %d \n", i + 1);
     }
   }
 
-  return level_num;
+  return result;
 }
 
 int main()
 {
-  int final_level = go_to_level(day_1_input);
-  printf("Final level: %d \n", final_level);
+  struct Result solution = get_result(DAY_1_INPUT);
+  printf("Entered basement at instruction number: %d \n", solution.basement_cmd_pos);
+  printf("Final level: %d \n", solution.level_num);
 
   return 0;
 }
